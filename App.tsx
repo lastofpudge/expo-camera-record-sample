@@ -7,15 +7,32 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { Camera } from 'expo-camera';
+
 import React, { useEffect, useRef, useState } from 'react';
 import * as MediaLibrary from 'expo-media-library';
 import { Audio } from 'expo-av';
+
+import { Camera } from 'expo-camera';
+import { Surface } from 'gl-react-expo';
+import { GLSL, Node, Shaders } from 'gl-react';
+import 'webgltexture-loader-expo-camera';
 
 export default function App() {
   const [status, setStatus] = useState('');
   const [recording, setRecording] = useState(false);
   const cameraRef = useRef(null);
+
+  const shaders = Shaders.create({
+    helloBlue: {
+      frag: GLSL`
+precision highp float;
+varying vec2 uv;
+uniform float blue;
+void main() {
+  gl_FragColor = vec4(uv.x, uv.y, blue, 1.0);
+}`,
+    },
+  });
 
   useEffect(() => {
     (async () => {
@@ -53,21 +70,31 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Camera style={styles.camera} type={Camera.Constants.Type.back} ref={cameraRef}>
-        <TouchableOpacity
-          style={[styles.button, recording ? styles.recording_btn : styles.default_btn]}
-          onPress={async () => {
-            if (!recording) {
-              setRecording(true);
-              let video = await cameraRef.current.recordAsync({ maxDuration: 30 });
-              await MediaLibrary.createAssetAsync(video.uri);
-            } else {
-              setRecording(false);
-              await cameraRef.current.stopRecording();
+      <Surface style={{ width: '100%', height: '100%' }}>
+        <Node
+          shader={shaders.helloBlue}
+          uniforms={
+            {
+              // t: () => cameraRef.current,
             }
-          }}
-        />
-      </Camera>
+          }>
+          <Camera style={styles.camera} type={Camera.Constants.Type.back} ref={cameraRef}>
+            <TouchableOpacity
+              style={[styles.button, recording ? styles.recording_btn : styles.default_btn]}
+              onPress={async () => {
+                if (!recording) {
+                  setRecording(true);
+                  let video = await cameraRef.current.recordAsync({ maxDuration: 30 });
+                  await MediaLibrary.createAssetAsync(video.uri);
+                } else {
+                  setRecording(false);
+                  await cameraRef.current.stopRecording();
+                }
+              }}
+            />
+          </Camera>
+        </Node>
+      </Surface>
     </View>
   );
 }

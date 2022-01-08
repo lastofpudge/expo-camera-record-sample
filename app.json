@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "cameralol",
-    "slug": "cameralol",
-    "version": "1.0.0",
+    "name": "camera-check-app",
+    "slug": "camera-check-app",
+    "version": "0.0.9",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -17,9 +17,17 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera to record video",
+        "NSPhotoLibraryUsageDescription": "This app uses the library to store video",
+        "NSMicrophoneUsageDescription": "This app uses the microphone to record audio while you are using the video camera"
+      }
     },
     "android": {
+      "package": "com.app.expo",
+      "permissions": [ "CAMERA", "RECORD_AUDIO", "WRITE_EXTERNAL_STORAGE"],
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"

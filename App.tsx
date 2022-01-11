@@ -13,7 +13,7 @@ import * as MediaLibrary from 'expo-media-library';
 import { Audio } from 'expo-av';
 
 export default function App() {
-  const [status, setStatus] = useState('');
+  const [status, setStatus] = useState(false);
   const [recording, setRecording] = useState(false);
   const cameraRef = useRef(null);
 
@@ -31,13 +31,13 @@ export default function App() {
         cameraPermission.status === 'granted' &&
         mediaPermission.status === 'granted'
       ) {
-        setStatus('granted');
+        setStatus(true);
       }
     })();
   }, []);
 
   /** Allow manual manage permissions */
-  if (status !== 'granted') {
+  if (status !== true) {
     return (
       <View style={styles.container}>
         <Text style={styles.text_wrong}>Wrong permissions</Text>
